@@ -2,6 +2,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import ipaddress
+import os
+import csv
 
 # ==============================
 # MAIN WINDOW
@@ -36,6 +38,29 @@ devices = [
         "status": "Offline"
     }
 ]
+
+#saves the devices to CSV
+def save_devices():
+    with open("devices.csv", "w", newline="") as file:
+        writer = csv.DictWriter(
+            file,
+            fieldnames=["name", "ip", "type", "status"]
+        )
+        writer.writeheader()
+        writer.writerows
+
+#Load devices from CSV
+def load_devices():
+    if not os.path.exists("devices.csv"):
+        return
+    
+    with open("devices.csv", "r", newline="") as file:
+        reader = csv.DictReader(file)
+        devices.clear()
+
+        for row in reader:
+            devices.append(row)
+
 
 # ==============================
 # HEADER
@@ -109,7 +134,7 @@ def show_dashboard():
     heading = tk.Label(
         content,
         text="Dashboard",
-        font=("Arial", 22, "bold"),
+        font=("Times New Roman", 22, "bold"),
         fg="white",
         bg="#0f172a"
     )
@@ -118,7 +143,7 @@ def show_dashboard():
     welcome = tk.Label(
         content,
         text="Welcome to NetWatch Network Security Monitoring.",
-        font=("Arial", 12),
+        font=("Times New Roman", 12),
         fg="#94a3b8",
         bg="#0f172a"
     )
@@ -127,7 +152,7 @@ def show_dashboard():
     device_count = tk.Label(
         content,
         text=f"Devices in Inventory: {len(devices)}",
-        font=("Arial", 14, "bold"),
+        font=("Times New Roman", 14, "bold"),
         fg="white",
         bg="#0f172a"
     )
@@ -143,7 +168,7 @@ def show_inventory():
     heading = tk.Label(
         content,
         text="Device Inventory",
-        font=("Arial", 22, "bold"),
+        font=("Times New Roman", 22, "bold"),
         fg="white",
         bg="#0f172a"
     )
@@ -194,7 +219,7 @@ def show_inventory():
     add_heading = tk.Label(
         content,
         text="Add New Device",
-        font=("Arial", 16, "bold"),
+        font=("Times New Roman", 16, "bold"),
         fg="white",
         bg="#0f172a"
     )
@@ -252,7 +277,7 @@ def show_inventory():
     )
     type_box.set("Server")
     type_box.pack(anchor="w", padx=30, pady=(5, 15))
-
+    
     # Add device function
 
     def add_device():
@@ -305,6 +330,9 @@ def show_inventory():
 
         devices.append(new_device)
 
+        #saves the device
+        save_devices()
+
         # Add device to table
 
         device_table.insert(
@@ -343,6 +371,52 @@ def show_inventory():
         pady=8
     )
     add_button.pack(anchor="w", padx=30, pady=5)
+
+        # Delete device
+    def remove_device():
+
+        # Get the selected row
+        selected_item = device_table.selection()
+
+        # Check if something is selected
+        if not selected_item:
+            messagebox.showwarning(
+                "No Selection",
+                "Please select a device to remove."
+            )
+            return
+
+        # Get information from selected row
+        device_data = device_table.item(selected_item[0])
+
+        # Get IP address
+        selected_ip = device_data["values"][1]
+
+        # Remove device from Python list
+        for device in devices:
+            if device["ip"] == selected_ip:
+                devices.remove(device)
+                save_devices()
+                break
+
+        # Remove device from table
+        device_table.delete(selected_item[0])
+
+    # Create Remove button
+    remove_button = tk.Button(
+        content,
+        text="Remove Selected",
+        command=remove_device,
+        bg="#dc2626",
+        fg="white",
+        font=("Times New Roman", 10, "bold"),
+        relief="flat",
+        padx=15,
+        pady=8
+    )
+
+    remove_button.pack(anchor="w", padx=30, pady=10)
+
 
 # ==============================
 # PORT ANALYZER PAGE
@@ -478,6 +552,7 @@ alerts_button.pack(fill="x")
 # ==============================
 # START PROGRAM
 # ==============================
+load_devices()
 
 show_dashboard()
 
