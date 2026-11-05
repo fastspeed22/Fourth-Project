@@ -373,7 +373,7 @@ def show_inventory():
                 "Please select a device to remove."
             )
             return
-
+        #Confirms weather user wants to delete a device
         confirm = messagebox.askyesno(
             "Confirm Deletion",
             "Are you sure you want to delete this device"
@@ -397,9 +397,11 @@ def show_inventory():
         # Remove device from table
         device_table.delete(selected_item[0])
 
+    #This function updates the status of the device
     def update_status():
+        #user needs to select before changing activity
         selected = device_table.selection()
-
+        #Displays message if not selected
         if not selected:
             messagebox.showwarning(
                 "No Selection",
@@ -407,6 +409,7 @@ def show_inventory():
             )
             return
 
+        #gets ip address of selected line
         item = device_table.item(selected[0])
         values = item["values"]
         device_ip = values[1]
@@ -416,12 +419,19 @@ def show_inventory():
             if device["ip"] == device_ip:
                 break
         else:
+            #if it cant find device display message
             messagebox.showerror(
                 "Error",
                 "Device not found."
             )
             return
 
+        #confirms if user wants to change the status
+        confirm = messagebox.askyesno(
+            "Confirm status change",
+            "Are you sure you want to change status?"
+        )
+            #changes offline to online and vise versa
         if device["status"] == "Online":
             device["status"] = "Offline"
         else:
@@ -436,6 +446,7 @@ def show_inventory():
                 device["status"]
             )
         )
+        #Saves this change in csv
         save_devices()
 
     # ==============================
@@ -483,9 +494,20 @@ def show_inventory():
         width=18
     )
 
-    remove_button.pack(side="left")
+    remove_button.pack(side="left", padx=(0,10))
 
-
+    #Creates status updater
+    status_button = tk.Button(
+        button_frame,
+        text="Change Status",
+        command=update_status,
+        bg="#0bf50b",
+        font=("Times New Roman", 12, "bold"),
+        relief="flat",
+        height=2,
+        width=18
+    )
+    status_button.pack(side="left")
 # ==============================
 # PORT ANALYZER PAGE
 # ==============================
