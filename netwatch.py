@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import ttk, messagebox
 import ipaddress
@@ -39,7 +38,7 @@ devices = [
     }
 ]
 
-#saves the devices to CSV
+# saves the devices to CSV
 def save_devices():
     with open("devices.csv", "w", newline="") as file:
         writer = csv.DictWriter(
@@ -47,13 +46,14 @@ def save_devices():
             fieldnames=["name", "ip", "type", "status"]
         )
         writer.writeheader()
-        writer.writerows
+        writer.writerows(devices)
 
-#Load devices from CSV
+
+# Load devices from CSV
 def load_devices():
     if not os.path.exists("devices.csv"):
         return
-    
+
     with open("devices.csv", "r", newline="") as file:
         reader = csv.DictReader(file)
         devices.clear()
@@ -124,6 +124,7 @@ def clear_main_area():
     for widget in content.winfo_children():
         widget.destroy()
 
+
 # ==============================
 # DASHBOARD PAGE
 # ==============================
@@ -157,6 +158,7 @@ def show_dashboard():
         bg="#0f172a"
     )
     device_count.pack(anchor="w", padx=30, pady=20)
+
 
 # ==============================
 # DEVICE INVENTORY PAGE
@@ -238,7 +240,7 @@ def show_inventory():
     name_entry = tk.Entry(
         content,
         width=35,
-        font=("Arial", 11)
+        font=("Times New Roman", 11)
     )
     name_entry.pack(anchor="w", padx=30, pady=(5, 10))
 
@@ -255,7 +257,7 @@ def show_inventory():
     ip_entry = tk.Entry(
         content,
         width=35,
-        font=("Arial", 11)
+        font=("Times New Roman", 11)
     )
     ip_entry.pack(anchor="w", padx=30, pady=(5, 10))
 
@@ -276,8 +278,8 @@ def show_inventory():
         width=32
     )
     type_box.set("Server")
-    type_box.pack(anchor="w", padx=30, pady=(5, 15))
-    
+    type_box.pack(anchor="w", padx=30, pady=10)
+
     # Add device function
 
     def add_device():
@@ -330,7 +332,7 @@ def show_inventory():
 
         devices.append(new_device)
 
-        #saves the device
+        # saves the device
         save_devices()
 
         # Add device to table
@@ -357,22 +359,8 @@ def show_inventory():
             f"{device_name} was successfully added."
         )
 
-    # Add device button
+    # Delete device
 
-    add_button = tk.Button(
-        content,
-        text="Add Device",
-        command=add_device,
-        bg="#2563eb",
-        fg="white",
-        font=("Arial", 10, "bold"),
-        relief="flat",
-        padx=15,
-        pady=8
-    )
-    add_button.pack(anchor="w", padx=30, pady=5)
-
-        # Delete device
     def remove_device():
 
         # Get the selected row
@@ -384,6 +372,13 @@ def show_inventory():
                 "No Selection",
                 "Please select a device to remove."
             )
+            return
+
+        confirm = messagebox.askyesno(
+            "Confirm Deletion",
+            "Are you sure you want to delete this device"
+        )
+        if not confirm:
             return
 
         # Get information from selected row
@@ -402,20 +397,93 @@ def show_inventory():
         # Remove device from table
         device_table.delete(selected_item[0])
 
-    # Create Remove button
-    remove_button = tk.Button(
+    def update_status():
+        selected = device_table.selection()
+
+        if not selected:
+            messagebox.showwarning(
+                "No Selection",
+                "Please select device first."
+            )
+            return
+
+        item = device_table.item(selected[0])
+        values = item["values"]
+        device_ip = values[1]
+
+        #checks each device the checks if ip matches device
+        for device in devices:
+            if device["ip"] == device_ip:
+                break
+        else:
+            messagebox.showerror(
+                "Error",
+                "Device not found."
+            )
+            return
+
+        if device["status"] == "Online":
+            device["status"] = "Offline"
+        else:
+            device["status"] = "Online"
+
+        device_table.item(
+            selected[0],
+            values=(
+                device["name"],
+                device["ip"],
+                device["type"],
+                device["status"]
+            )
+        )
+        save_devices()
+
+    # ==============================
+    # BUTTON FRAME
+    # ==============================
+
+    button_frame = tk.Frame(
         content,
-        text="Remove Selected",
+        bg="#0f172a"
+    )
+
+    button_frame.pack(
+        anchor="nw",
+        padx=30,
+        pady=10
+    )
+
+    # Add device button
+
+    add_button = tk.Button(
+        button_frame,
+        text="Add Device",
+        command=add_device,
+        bg="#2563eb",
+        fg="white",
+        font=("Times New Roman", 12, "bold"),
+        relief="flat",
+        height=2,
+        width=18
+    )
+
+    add_button.pack(side="left", padx=(0, 10))
+
+    # Create Remove button
+
+    remove_button = tk.Button(
+        button_frame,
+        text="Remove Device",
         command=remove_device,
         bg="#dc2626",
         fg="white",
-        font=("Times New Roman", 10, "bold"),
+        font=("Times New Roman", 12, "bold"),
         relief="flat",
-        padx=15,
-        pady=8
+        height=2,
+        width=18
     )
 
-    remove_button.pack(anchor="w", padx=30, pady=10)
+    remove_button.pack(side="left")
 
 
 # ==============================
@@ -428,7 +496,7 @@ def show_port_analyzer():
     heading = tk.Label(
         content,
         text="Port Analyzer",
-        font=("Arial", 22, "bold"),
+        font=("Times New Roman", 22, "bold"),
         fg="white",
         bg="#0f172a"
     )
@@ -437,11 +505,12 @@ def show_port_analyzer():
     description = tk.Label(
         content,
         text="Analyze ports and identify their commonly associated services.",
-        font=("Arial", 12),
+        font=("Times New Roman", 12),
         fg="#94a3b8",
         bg="#0f172a"
     )
     description.pack(anchor="w", padx=30)
+
 
 # ==============================
 # TRAFFIC ANALYSIS PAGE
@@ -453,7 +522,7 @@ def show_traffic_analysis():
     heading = tk.Label(
         content,
         text="Traffic Analysis",
-        font=("Arial", 22, "bold"),
+        font=("Times New Roman", 22, "bold"),
         fg="white",
         bg="#0f172a"
     )
@@ -462,11 +531,12 @@ def show_traffic_analysis():
     description = tk.Label(
         content,
         text="Analyze network traffic records and identify patterns.",
-        font=("Arial", 12),
+        font=("Times New Roman", 12),
         fg="#94a3b8",
         bg="#0f172a"
     )
     description.pack(anchor="w", padx=30)
+
 
 # ==============================
 # SECURITY ALERTS PAGE
@@ -478,7 +548,7 @@ def show_security_alerts():
     heading = tk.Label(
         content,
         text="Security Alerts",
-        font=("Arial", 22, "bold"),
+        font=("Times New Roman", 22, "bold"),
         fg="white",
         bg="#0f172a"
     )
@@ -487,11 +557,12 @@ def show_security_alerts():
     description = tk.Label(
         content,
         text="Security alerts and suspicious activity will appear here.",
-        font=("Arial", 12),
+        font=("Times New Roman", 12),
         fg="#94a3b8",
         bg="#0f172a"
     )
     description.pack(anchor="w", padx=30)
+
 
 # ==============================
 # SIDEBAR BUTTONS
@@ -549,11 +620,14 @@ alerts_button = tk.Button(
 )
 alerts_button.pack(fill="x")
 
+
 # ==============================
 # START PROGRAM
 # ==============================
+
 load_devices()
 
 show_dashboard()
 
 root.mainloop()
+
