@@ -123,14 +123,23 @@ content.pack(side="right", fill="both", expand=True)
 def clear_main_area():
     for widget in content.winfo_children():
         widget.destroy()
-
-
+    
 # ==============================
 # DASHBOARD PAGE
 # ==============================
 
 def show_dashboard():
     clear_main_area()
+
+    #Counts if devices and shows how many there are 
+    online_count = 0
+    offline_count = 0
+    
+    for device in devices:
+        if device["status"] == "Online":
+            online_count += 1
+        else:
+            offline_count += 1
 
     heading = tk.Label(
         content,
@@ -139,7 +148,7 @@ def show_dashboard():
         fg="white",
         bg="#0f172a"
     )
-    heading.pack(anchor="w", padx=30, pady=30)
+    heading.pack(anchor="w", padx=30, pady=20)
 
     welcome = tk.Label(
         content,
@@ -148,7 +157,7 @@ def show_dashboard():
         fg="#94a3b8",
         bg="#0f172a"
     )
-    welcome.pack(anchor="w", padx=30)
+    welcome.pack(anchor="w", padx=30, pady=20)
 
     device_count = tk.Label(
         content,
@@ -157,9 +166,25 @@ def show_dashboard():
         fg="white",
         bg="#0f172a"
     )
-    device_count.pack(anchor="w", padx=30, pady=20)
+    device_count.pack(anchor="w", padx=30,)
 
+    online_label = tk.Label(
+        content,
+        text=f"Online Devices: {online_count}",
+        font=("Times New Roman", 14, "bold"),
+        fg="white",
+        bg="#0f172a"
+    )
+    online_label.pack(anchor="w", padx=30)
 
+    offline_label = tk.Label(
+        content,
+        text=f"Offline Devices: {offline_count}",
+        font=("Times New Roman", 14, "bold"),
+        fg="white",
+        bg="#0f172a"
+    )
+    offline_label.pack(anchor="w", padx=30)
 # ==============================
 # DEVICE INVENTORY PAGE
 # ==============================
@@ -175,6 +200,27 @@ def show_inventory():
         bg="#0f172a"
     )
     heading.pack(anchor="w", padx=30, pady=(30, 15))
+
+    search_bar = tk.Entry(
+        content,
+        font=("Times New Roman", 12,),
+        fg="white",
+        bg="#0f172a" 
+    )
+    search_bar.get()
+
+    def search_device():
+        search_text = search_bar.get().lower()
+        for device in devices:
+            if search_text in ["name"].lower():
+                print(device["name"])
+            elif search_text in ["ip"]:
+                print(device["ip"])
+            elif search_text in ["type"]:
+                print(device["type"])
+            elif search_text in ["status"]:
+                print(device["status"])
+
 
     # Device table
 
@@ -359,8 +405,9 @@ def show_inventory():
             f"{device_name} was successfully added."
         )
 
-    # Delete device
+    
 
+    # Delete device
     def remove_device():
 
         # Get the selected row
@@ -431,6 +478,8 @@ def show_inventory():
             "Confirm status change",
             "Are you sure you want to change status?"
         )
+        if not confirm:
+            return
             #changes offline to online and vise versa
         if device["status"] == "Online":
             device["status"] = "Offline"
@@ -448,6 +497,7 @@ def show_inventory():
         )
         #Saves this change in csv
         save_devices()
+        
 
     # ==============================
     # BUTTON FRAME
@@ -501,7 +551,7 @@ def show_inventory():
         button_frame,
         text="Change Status",
         command=update_status,
-        bg="#0bf50b",
+        bg="#16a34a",
         font=("Times New Roman", 12, "bold"),
         relief="flat",
         height=2,
