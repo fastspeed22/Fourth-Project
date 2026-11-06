@@ -207,19 +207,38 @@ def show_inventory():
         fg="white",
         bg="#0f172a" 
     )
-    search_bar.get()
+    search_bar.pack(anchor="w", padx=30)
 
     def search_device():
+        #The text = whatever the user puts in the search bar
         search_text = search_bar.get().lower()
+
+        #Deletes initial device
+        for row in device_table.get_children():
+                    device_table.delete(row)
+
+        #Searches for whatever user puts in then outputs the name
         for device in devices:
-            if search_text in ["name"].lower():
-                print(device["name"])
-            elif search_text in ["ip"]:
-                print(device["ip"])
-            elif search_text in ["type"]:
-                print(device["type"])
-            elif search_text in ["status"]:
-                print(device["status"])
+            if (
+                search_text in device["name"].lower() 
+                or search_text in device["ip"].lower() 
+                or search_text in device["type"].lower() 
+                or search_text in device["status"].lower()
+                ):
+
+                device_table.insert(
+                            "",
+                            "end",
+                            values=(
+                                device["name"],
+                                device["ip"],
+                                device["type"],
+                                device["status"]
+                            )
+                        )
+
+        
+              
 
 
     # Device table
